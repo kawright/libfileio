@@ -4,6 +4,7 @@
 #include <err.h>
 #include <mem.h>
 
+#include <stdarg.h>
 #include <stdio.h>
 
 U64 read_file_to_str(Ch *path, Ch **str, Err *err) {
@@ -43,3 +44,16 @@ Void write_str_to_file(Ch *path, Ch *str, Err *err) {
     fclose(fp);
 }
 
+Void write_fmt_to_file(Ch *path, Ch *fmt, Err *err, ...) {
+    FILE        *fp;
+    va_list     args;
+    fp = fopen(path, "w");
+    if (fp == NIL) {
+        THROW(err, ErrCode_IO, "Could not open file %s", path)
+        return;
+    }
+    va_start(args, err);
+    vfprintf(fp, fmt, args);
+    va_end(args);
+    fclose(fp);
+}
