@@ -1,7 +1,7 @@
 # ----- PROJECT INFO -----
 
 PROJ_NAME := libfileio
-VER := 1.0
+VER := 2.0
 
 # ----- COMPILER CONFIGURATION -----
 

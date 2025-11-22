@@ -11,6 +11,6 @@
 U64 read_file_to_str(Ch *path, Ch **dest, Err *err);
 
 /* Write data into a file. Throws IO. */
-Void write_file_to_str(Ch *path, Ch *data, U64 len, Err *err);
+Void write_str_to_file(Ch *path, Ch *str, Err *err);
 
 #endif
