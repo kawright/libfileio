@@ -9,16 +9,21 @@ CC := gcc
 CC_OPTS := \
 	-Wall \
 	-Werror \
-	-fpic
+	-fpic \
+	-g
+
+CC_LIBS := \
+	-lerr \
+	-lmem
 
 # ----- REAL TARGETS -----
 
 build/lib/libfileio.so: build/obj/fileio.o
 	@mkdir -p build/lib
-	@${CC} -shared -o $@ $<
+	@${CC} -shared -o $@ $< ${CC_LIBS}
 	@echo "Built target $@"
 
-build/obj/fileio.o: fileio.c fileio.h
+build/obj/fileio.o: fileio.c fileio.h Makefile
 	@mkdir -p build/obj
 	@${CC} ${CC_OPTS} -c -o $@ $<
 	@echo "Built target $@"
