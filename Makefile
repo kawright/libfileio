@@ -54,21 +54,31 @@ clean:
 
 install: build/lib/libfileio.so
 	@mkdir -p /usr/local/etc/libfileio
+	
 	@cp fileio.h /usr/local/include/fileio.h
 	@echo "Copied fileio.h"
+	
 	@cp build/lib/libfileio.so /usr/local/lib/libfileio.so
 	@echo "Copied libfileio.so"
+
+	@cp .ver /usr/local/etc/libfileio/.ver
+	@echo "Copied .ver"
+	
 	@cp .__lib__ /usr/local/etc/libfileio/.__lib__
 	@echo "Copied .__lib__"
+	
 	@echo "${PROJ_NAME} version ${PROJ_VER} successfully installed"
 
 uninstall:
 	@rm /usr/local/include/fileio.h
 	@echo "Deleted fileio.h"
+	
 	@rm /usr/local/lib/libfileio.so
 	@echo "Deleted libfileio.so"
+	
 	@rm -rf /usr/local/etc/libfileio
 	@echo "Deleted all configuration files"
+	
 	@echo "${PROJ_NAME} successfully uninstalled"
 
 ver:
