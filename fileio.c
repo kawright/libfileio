@@ -4,8 +4,97 @@
 #include <err.h>
 #include <mem.h>
 
+#include <dirent.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
+
+Void free_file_list(FileList *list) {
+	free_mem(list->contents);
+	list->contents = NIL;
+}
+
+U16 get_dir_sz(Ch *path, Err *err) {
+	DIR 				*dir_handle;
+	struct dirent		*dir_obj;
+	U16					ret_data;
+	dir_handle 			= opendir(path);
+	ret_data			= 0;
+	if (dir_handle == NIL) {
+		THROW(err, ErrCode_IO, "Could not query contents of dir %s", path)
+		return 0;
+	}
+	while ((dir_obj = readdir(dir_handle)) != NIL) {
+		ret_data++;
+	}
+	return ret_data;
+}
+
+FileEntry *get_file_list_entry(FileList *list, U16 index, Err *err) {
+	if (index >= list->sz) {
+		THROW(err, ErrCode_BOUNDS, 
+			"Out-of-bounds file list access at index %ld", index)
+		return NIL;
+	}
+	return (FileEntry *) list->contents + index;
+}
+
+Void init_file_entry(FileEntry *entry) {
+	entry->type 			= FileEntryType_FILE;
+	entry->name[0]			= '\0';
+	entry->sz				= 0;
+}
+
+Void init_file_list(FileList *list) {
+	list->contents			= NIL;
+	list->sz				= 0;
+}
+
+Void ld_file_list(FileList *list, Ch *path, Err *err) {
+	DIR 				*dir_handle;
+	struct dirent		*dir_obj;
+	U16					dir_sz;
+	dir_sz = get_dir_sz(path, err);
+	if (is_err(err))
+		return;
+	list->sz = dir_sz;
+	list->contents = alloc_mem(dir_sz * sizeof(FileEntry), err);
+	if (is_err(err))
+		goto CLEANUP;
+	dir_handle = opendir(path);
+	if (dir_handle == NIL) {
+		THROW(err, ErrCode_IO, "Could not query contents of dir %s", path)
+		goto CLEANUP;
+	}
+	U16 index = 0;
+	while ((dir_obj = readdir(dir_handle)) != NIL) {
+		FileEntry *temp_entry = (FileEntry*) list->contents + index;
+		switch (dir_obj->d_type) {
+			case DT_DIR:
+			temp_entry->type = FileEntryType_DIR;
+			break;
+
+			case DT_LNK:
+			temp_entry->type = FileEntryType_LINK;
+			break;
+
+			case DT_REG:
+			temp_entry->type = FileEntryType_FILE;
+			break;
+
+			default:
+			temp_entry->type = FileEntryType_OTHER;
+			break;
+		}
+		strcpy(temp_entry->name, dir_obj->d_name);
+		temp_entry->sz = dir_obj->d_reclen;
+	}
+
+	CLEANUP:
+	if (is_err(err))
+		free_file_list(list);
+	return;
+}
 
 U64 read_file_to_str(Ch *path, Ch **str, Err *err) {
     FILE        *fp;
@@ -29,7 +118,8 @@ U64 read_file_to_str(Ch *path, Ch **str, Err *err) {
         free_mem(*str);
         return 0;
     }
-    *str[sz] = '\0';
+    Ch *temp_str = *str;
+    temp_str[sz] = '\0';
     return bytes_read;
 }
 

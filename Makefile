@@ -1,7 +1,8 @@
 # ----- PROJECT INFO -----
 
 PROJ_NAME := libfileio
-VER := 2.1
+PROJ_DESC := "file input/output"
+PROJ_VER := 2.3
 
 # ----- COMPILER CONFIGURATION -----
 
@@ -17,6 +18,14 @@ CC_LIBS := \
 	-lmem
 
 # ----- REAL TARGETS -----
+
+.ver: build/lib/libfileio.so
+	@ver -s -n ${PROJ_NAME} -d ${PROJ_DESC}
+	@echo "Updated project metadata"
+	
+.__lib__:
+	@touch .__lib__
+	@echo "Touched library marker file"
 
 build/lib/libfileio.so: build/obj/fileio.o
 	@mkdir -p build/lib
@@ -34,26 +43,34 @@ build/obj/fileio.o: fileio.c fileio.h Makefile
 	all \
 	clean \
 	install \
-	uninstall
+	uninstall \
+	ver
 
-all: build/lib/libfileio.so
-	@echo Built ${PROJ_NAME} version ${VER}
-
+all: build/lib/libfileio.so .ver .__lib__
+	@echo "Built ${PROJ_NAME} version ${PROJ_VER} (build $$(ver -b))"
 clean:
 	@rm -rf build
 	@echo "All build artifacts removed"
 
 install: build/lib/libfileio.so
+	@mkdir -p /usr/local/etc/libfileio
 	@cp fileio.h /usr/local/include/fileio.h
 	@echo "Copied fileio.h"
 	@cp build/lib/libfileio.so /usr/local/lib/libfileio.so
 	@echo "Copied libfileio.so"
-	@echo "${PROJ_NAME} version ${VER} successfully installed"
+	@cp .__lib__ /usr/local/etc/libfileio/.__lib__
+	@echo "Copied .__lib__"
+	@echo "${PROJ_NAME} version ${PROJ_VER} successfully installed"
 
 uninstall:
 	@rm /usr/local/include/fileio.h
 	@echo "Deleted fileio.h"
 	@rm /usr/local/lib/libfileio.so
 	@echo "Deleted libfileio.so"
+	@rm -rf /usr/local/etc/libfileio
+	@echo "Deleted all configuration files"
 	@echo "${PROJ_NAME} successfully uninstalled"
 
+ver:
+	@ver -V ${PROJ_VER}
+	@echo "Updated version number to ${PROJ_VER}"
