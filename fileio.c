@@ -9,6 +9,12 @@
 #include <stdio.h>
 #include <string.h>
 
+/* ----- CONSTANTS ----- */
+
+#define TEMP_FULL_PATH_BUF_SZ 512
+
+/* ----- FUNCTIONS ----- */
+
 Void build_path(Ch *out, U16 max, Err *err, ...) {
     va_list     args;
     va_start(args, err);
@@ -112,7 +118,8 @@ Void ld_file_list(FileList *list, Ch *path, Err *err) {
 		THROW(err, ErrCode_IO, "Could not query contents of dir %s", path)
 		goto CLEANUP;
 	}
-	U16 index = 0;
+	U16         index = 0;
+    Ch          temp_full_path[TEMP_FULL_PATH_BUF_SZ];
 	while ((dir_obj = readdir(dir_handle)) != NIL) {
 		FileEntry *temp_entry = (FileEntry*) list->contents + index;
 		switch (dir_obj->d_type) {
@@ -133,6 +140,14 @@ Void ld_file_list(FileList *list, Ch *path, Err *err) {
 			break;
 		}
 		strcpy(temp_entry->name, dir_obj->d_name);
+        build_path(temp_full_path, TEMP_FULL_PATH_BUF_SZ - 1, err, path, 
+            temp_entry->name);
+        if (is_err(err))
+            goto CLEANUP;
+        temp_entry->sz = file_sz(temp_full_path, err);
+        if (is_err(err)) {
+            goto CLEANUP;
+        }
 	    index++;
     }
 

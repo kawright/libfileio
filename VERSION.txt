@@ -1,6 +1,6 @@
 libfileio - file input output
 
-Version Number: 2.6
-Version Date: 2025-11-30 09:04:38
-Build Number: 9
-Build Date: 2025-11-30 09:04:38
+Version Number: 2.7
+Version Date: 2025-11-30 09:12:56
+Build Number: 11
+Build Date: 2025-11-30 09:12:56
