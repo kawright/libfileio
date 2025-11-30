@@ -88,7 +88,8 @@ Void ld_file_list(FileList *list, Ch *path, Err *err) {
 		}
 		strcpy(temp_entry->name, dir_obj->d_name);
 		temp_entry->sz = dir_obj->d_reclen;
-	}
+	    index++;
+    }
 
 	CLEANUP:
 	if (is_err(err))
