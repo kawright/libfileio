@@ -9,6 +9,38 @@
 #include <stdio.h>
 #include <string.h>
 
+Void build_path(Ch *out, U16 max, Err *err, ...) {
+    va_list     args;
+    va_start(args, err);
+    Ch *last_arg = va_arg(args, Ch*);
+    U16 i = 0;
+    while (last_arg != NIL) {
+        U16 j = 0;
+        Ch last_ch = last_arg[j];
+        while (last_ch != '\0') {
+            out[i] = last_ch;
+            i++;
+            if (i >= max) {
+                THROW(err, ErrCode_BOUNDS, "Path exceeds max length of %d",
+                    max)
+                goto CLEANUP;
+            }
+            j++;
+            last_ch = last_arg[j];
+        }
+        out[i] = '/';
+        i++;
+        if (i >= max) {
+            THROW(err, ErrCode_BOUNDS, "Path exceeds max length of %d", max)
+            goto CLEANUP;
+        }
+        last_arg = va_arg(args, Ch*);
+    }
+
+    CLEANUP:
+    va_end(args);
+}
+
 U64 file_sz(Ch *path, Err *err) {
     FILE        *fp;
     U64         ret_data;
@@ -101,7 +133,6 @@ Void ld_file_list(FileList *list, Ch *path, Err *err) {
 			break;
 		}
 		strcpy(temp_entry->name, dir_obj->d_name);
-		temp_entry->sz = dir_obj->d_reclen;
 	    index++;
     }
 

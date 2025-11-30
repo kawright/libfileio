@@ -32,6 +32,11 @@ typedef struct STRUCT_FILE_LIST {
     U16                 sz;
 } FileList;
 
+/* Build a path from multiple file parts, and write at most 'max' bytes of it
+to 'out'. The final argument passed in should be a sentinal 'NIL'. Throws
+BOUNDS. */
+Void build_path(Ch *out, U16 max, Err *err, ...);
+
 /* Get the size of a file, in bytes. Throws IO. */
 U64 file_sz(Ch *path, Err *err);
 
