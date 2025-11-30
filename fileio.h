@@ -32,6 +32,9 @@ typedef struct STRUCT_FILE_LIST {
     U16                 sz;
 } FileList;
 
+/* Get the size of a file, in bytes. Throws IO. */
+U64 file_sz(Ch *path, Err *err);
+
 /* Free heap data allocated to a 'FileList'. */
 Void free_file_list(FileList *list);
 

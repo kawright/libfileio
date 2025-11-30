@@ -2,7 +2,7 @@
 
 PROJ_NAME := fileio
 PROJ_DESC := "file input output"
-PROJ_VER := 2.4
+PROJ_VER := 2.5
 
 # ----- COMPILER CONFIGURATION -----
 

@@ -9,6 +9,20 @@
 #include <stdio.h>
 #include <string.h>
 
+U64 file_sz(Ch *path, Err *err) {
+    FILE        *fp;
+    U64         ret_data;
+    fp = fopen(path, "r");
+    if (fp == NIL) {
+        THROW(err, ErrCode_IO, "Could not open file %s", path)
+        return 0;
+    }
+    fseek(fp, 0L, SEEK_END); 
+    ret_data = ftell(fp);
+    fclose(fp);
+    return ret_data;
+}
+
 Void free_file_list(FileList *list) {
 	free_mem(list->contents);
 	list->contents = NIL;
